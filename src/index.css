@@ -1,13 +1,34 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+*, *::before, *::after {
+    margin: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+:root {
+    --dark-blue-1: #393C42;
+    --dark-blue-2: #2F3136;
+    --dark-blue-3: #36393F;
+    --dark-blue-4: #202225;
+    --dark-blue-5: #292B2F;
+    --light-grey-1: #72767D;
+    --light-grey-2: #B9BBBE;
+    --white-1: #FFFFFF;
+    --green-1: #43B581;
+    --orange-1: #FAA61A;
 }
+
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+html {
+    /* This defines what 1 rem is */
+    font-size: 62.5%;
+}
+
+body {
+    box-sizing: border-box;
+    font-family: Poppins;
+} 
