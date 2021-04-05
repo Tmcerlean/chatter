@@ -15,3 +15,17 @@ export const signIn = () => {
         type: 'SIGN_IN'
     };
 };
+
+export const enterChannel = (id) => {
+    return {
+        type: 'ENTER_CHANNEL',
+        payload: id
+    };
+};
+
+export const setChannels = (channels) => {
+    return {
+        type: 'SET_CHANNELS',
+        payload: channels
+    };
+};

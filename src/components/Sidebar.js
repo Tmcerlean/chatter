@@ -1,31 +1,46 @@
 import styled from 'styled-components';
 import AddIcon from '@material-ui/icons/Add';
 import LanguageIcon from '@material-ui/icons/Language';
-import Channel from './Channel';
+import ChannelOption from './ChannelOption';
+import { firestore } from '../firebase';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setChannels } from '../actions';
 
 const Sidebar = () => {
+
+    const dispatch = useDispatch();
+    const channels = useSelector((state) => state.channels);
+
+    // const [channels, setChannels] = useState();
+    useEffect(() => {
+      getChannels();
+    }, []);
+
+    const getChannels = async () => {
+      const snapShot = await firestore.collection('rooms').get()
+      dispatch(setChannels(snapShot));
+    };
+  
+    const renderChannels = () =>
+        channels.docs.map(doc => {
+            return <ChannelOption title={doc.data().name} key={doc.id} id={doc.id} />;
+    });
+
     return (
         <SidebarContainer>
             {/* Search */}
             <SidebarSearchContainer>
                 <SidebarSearch placeholder="Find or create a channel"/>
             </SidebarSearchContainer>
-            {/* Global Channels */}
-            <GlobalChannelContainer>
+            {/* Channels */}
+            <ChannelContainer>
                 <ChannelHeader>
-                    <ChannelText>Global Channels</ChannelText>
-                </ChannelHeader>
-                <ChannelBlock>
-                    <Channel Icon={LanguageIcon} />
-                </ChannelBlock>
-            </GlobalChannelContainer>
-            {/* Custom Channels */}
-            <CustomChannelContainer>
-                <ChannelHeader>
-                    <ChannelText>Custom Channels</ChannelText>
+                    <ChannelHeaderText>Channels</ChannelHeaderText>
                     <AddIconStyled style={{ fontSize: 16 }}/>
                 </ChannelHeader>
-            </CustomChannelContainer>
+                {channels && channels.docs && renderChannels()} 
+            </ChannelContainer>
             {/* Profile */}
             <ProfileContainer>
 
@@ -41,8 +56,6 @@ const SidebarContainer = styled.div`
     align-items: center;
     flex-direction: column;
     min-width: 30rem;
-    max-width: 20%;
-    height: 100vh;
     background-color: var(--dark-blue-2);
 `;
 
@@ -66,13 +79,7 @@ const SidebarSearch = styled.input`
     font-size: 1.4rem;
 `;
 
-const GlobalChannelContainer = styled.div`
-    width: 90%;
-    height: 10px;
-    margin-top: 1.25rem;
-`;
-
-const CustomChannelContainer = styled.div`
+const ChannelContainer = styled.div`
     width: 90%;
     height: 10px;
     margin-top: 1.25rem;
@@ -87,7 +94,7 @@ const ChannelHeader = styled.div`
 const ChannelBlock = styled.div`
 `;
 
-const ChannelText = styled.div`
+const ChannelHeaderText = styled.div`
     text-transform: uppercase;
     font-size: 1.2rem;
     font-weight: 900;

@@ -6,10 +6,10 @@ import {
   Link
 } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
 import { increment, decrement, signIn } from '../actions';
 import { firestore } from '../firebase';
 import Chat from './Chat';
-import Main from './Main';
 import Sidebar from './Sidebar';
 
 const App = () => {
@@ -34,14 +34,21 @@ const App = () => {
 
   return (
     <Router>
-      <Sidebar />
-      <Switch>
-        <Route path="/" exact>
-          <Chat />
-        </Route>
-      </Switch>
+      <Main>
+        <Sidebar />
+        <Switch>
+          <Route path="/" exact>
+            <Chat />
+          </Route>
+        </Switch>
+      </Main>
     </Router>
   );
 };
 
 export default App;
+
+const Main = styled.main`
+  display: flex;
+  height: 100vh;
+`;
