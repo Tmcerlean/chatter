@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { firestore } from '../firebase';
 import { setMessages } from '../actions';
@@ -12,8 +12,8 @@ const Chat = () => {
     const messages = useSelector((state) => state.messages);
 
     useEffect(() => {
-        console.log(currentChannel);
         getMessages();
+        getChannelName();
     }, [currentChannel]);
 
     const getMessages = async () => {
@@ -40,12 +40,14 @@ const Chat = () => {
     const getChannelName = () => {
         if (currentChannel) {
 
+            console.log(currentChannel);
+
             const channel = firestore.collection("rooms").doc(currentChannel);
 
             channel.get().then((doc) => {
                 if (doc.exists) {
                     console.log(doc.data().name)
-                    return doc.data().name;
+                    setChannelName(doc.data().name);
                 } else {
                     console.log("No such document!");
                 }
@@ -55,13 +57,12 @@ const Chat = () => {
         }
     }
 
-
-    
+    const [channelName, setChannelName] = useState("");
 
     return (
         <ChatContainer>
             <ChatHeaderContainer>
-                <ChatHeaderText>#{getChannelName()}</ChatHeaderText>
+                <ChatHeaderText>#{channelName}</ChatHeaderText>
             </ChatHeaderContainer>
             <ChatBodyContainer>
                 <ChatMessages>
