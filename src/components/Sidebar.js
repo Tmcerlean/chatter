@@ -12,19 +12,39 @@ const Sidebar = () => {
     const dispatch = useDispatch();
     const channels = useSelector((state) => state.channels);
 
-    // const [channels, setChannels] = useState();
     useEffect(() => {
       getChannels();
     }, []);
 
     const getChannels = async () => {
-      const snapShot = await firestore.collection('rooms').get()
-      dispatch(setChannels(snapShot));
+        const snapShot = await firestore.collection('rooms').orderBy('name', 'asc').onSnapshot((querySnapshot) => {
+            if (querySnapshot) {
+                console.log(querySnapshot)
+                dispatch(setChannels(querySnapshot));
+            }
+        })
+    };
+
+    const addChannel = async () => {
+        const newChannel = await prompt("Please enter a channel name");
+        firestore.collection("rooms").doc().set({
+            name: newChannel
+        })
+        .then(() => {
+            console.log("Document successfully written!");
+        })
+        .catch((error) => {
+            console.error("Error writing document: ", error);
+        });
     };
   
     const renderChannels = () =>
         channels.docs.map(doc => {
-            return <ChannelOption title={doc.data().name} key={doc.id} id={doc.id} />;
+            return <ChannelOption 
+                key={doc.id} 
+                id={doc.id} 
+                title={doc.data().name} 
+            />;
     });
 
     return (
@@ -35,7 +55,7 @@ const Sidebar = () => {
             </SidebarSearchContainer>
             {/* Channels */}
             <ChannelContainer>
-                <ChannelHeader>
+                <ChannelHeader onClick={() => addChannel()}>
                     <ChannelHeaderText>Channels</ChannelHeaderText>
                     <AddIconStyled style={{ fontSize: 16 }}/>
                 </ChannelHeader>
@@ -89,6 +109,7 @@ const ChannelHeader = styled.div`
     display: flex;
     align-items: center;
     width: 100%;
+    cursor: pointer;
 `;
 
 const ChannelBlock = styled.div`

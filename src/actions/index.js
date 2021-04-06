@@ -29,3 +29,10 @@ export const setChannels = (channels) => {
         payload: channels
     };
 };
+
+export const setMessages = (messages) => {
+    return {
+        type: 'SET_MESSAGES',
+        payload: messages
+    };
+};
