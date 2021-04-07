@@ -23,6 +23,13 @@ export const enterChannel = (id) => {
     };
 };
 
+export const storeChannel = (data) => {
+    return {
+        type: 'STORE_CHANNEL',
+        payload: data
+    };
+};
+
 export const setChannels = (channels) => {
     return {
         type: 'SET_CHANNELS',

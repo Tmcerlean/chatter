@@ -21,7 +21,6 @@ const MessageContainer = styled.div`
     display: flex;
     width: 100%;
     padding: 1.5rem;
-    border-bottom: 1px solid lightgrey;
 
     &:hover {
         background-color: var(--dark-blue-6);

@@ -63,7 +63,13 @@ const Sidebar = () => {
             </ChannelContainer>
             {/* Profile */}
             <ProfileContainer>
-
+                <ImageContainer>
+                    <Image src="https://i.ibb.co/ysfSym2/31129724.jpg" />
+                    <OnlineStatus />
+                </ImageContainer>
+                <UserInfo>
+                    <Username>Tom</Username>
+                </UserInfo>
             </ProfileContainer>
         </SidebarContainer>
     )
@@ -130,8 +136,48 @@ const AddIconStyled = styled(AddIcon)`
 
 const ProfileContainer = styled.div`
     display: flex;
+    align-items: center;
     margin-top: auto;
     width: 100%;
     height: 5.5rem;
+    padding-left: 1.5rem;
     background-color: var(--dark-blue-5);
+`;
+
+const ImageContainer = styled.div`
+    position: relative;
+    display: flex;
+    align-items: center;
+`;
+
+const Image = styled.img`
+    box-sizing: border-box;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+`;
+
+const OnlineStatus = styled.div`
+    position: absolute;
+    bottom: 0.6rem;
+    right: -0.6rem;
+    width: 1.3rem;
+    height: 1.3rem;
+    border: 0.25rem solid var(--dark-blue-5);
+    border-radius: 50%;
+    background-color: var(--green-1);
+`;
+
+const UserInfo = styled.div`
+    display: flex;
+    align-items: center;
+    flex: 1;
+`;
+
+const Username = styled.div`
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--white-1);
+    padding-left: 1rem;
 `;

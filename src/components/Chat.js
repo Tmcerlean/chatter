@@ -1,14 +1,17 @@
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { firestore } from '../firebase';
-import { setMessages } from '../actions';
+import { setMessages, storeChannel } from '../actions';
 import Message from './Message';
+import ChatInput from './ChatInput';
 
 const Chat = () => {
 
+    const chatInputRef = useRef(null);
     const dispatch = useDispatch();
     const currentChannel = useSelector((state) => state.currentChannel);
+    const currentChannelInfo = useSelector((state) => state.currentChannelInfo);
     const messages = useSelector((state) => state.messages);
 
     useEffect(() => {
@@ -18,11 +21,14 @@ const Chat = () => {
 
     const getMessages = async () => {
         if (currentChannel) {
-            const snapShot = await firestore.collection('rooms').doc(currentChannel).collection('messages').orderBy('timestamp', 'asc').get();
-            dispatch(setMessages(snapShot));
-        } else {
-            return
-        }  
+            await firestore.collection('rooms').doc(currentChannel).collection('messages').orderBy('timestamp', 'asc').onSnapshot((querySnapshot) => {
+                if (querySnapshot) {
+                    dispatch(setMessages(querySnapshot));
+                } else {
+                    return
+                }
+            })
+        };  
     };
 
     const renderMessages = () =>
@@ -37,37 +43,34 @@ const Chat = () => {
         />;
     });
 
-    const getChannelName = () => {
+    const getChannelName = async () => {
         if (currentChannel) {
 
-            console.log(currentChannel);
-
-            const channel = firestore.collection("rooms").doc(currentChannel);
+            const channel = await firestore.collection("rooms").doc(currentChannel);
 
             channel.get().then((doc) => {
                 if (doc.exists) {
-                    console.log(doc.data().name)
-                    setChannelName(doc.data().name);
+                    dispatch(storeChannel(doc.data()));
                 } else {
                     console.log("No such document!");
                 }
             }).catch((error) => {
                 console.log("Error getting document:", error);
             });
-        }
-    }
-
-    const [channelName, setChannelName] = useState("");
+        };
+    };
 
     return (
         <ChatContainer>
             <ChatHeaderContainer>
-                <ChatHeaderText>#{channelName}</ChatHeaderText>
+                <ChatHeaderText>#{currentChannelInfo?.name}</ChatHeaderText>
             </ChatHeaderContainer>
             <ChatBodyContainer>
                 <ChatMessages>
                     {messages && messages.docs && renderMessages()} 
+                    <ChatBottom ref={chatInputRef} />
                 </ChatMessages>
+                <ChatInput chatInputRef={ chatInputRef } />
             </ChatBodyContainer>
         </ChatContainer>
     )
@@ -100,14 +103,19 @@ const ChatHeaderText = styled.div`
 `;
 
 const ChatBodyContainer = styled.div`
+    position: relative;
     display: flex;
     justify-content: flex-start;
     width: 100%;
     height: calc(100vh - 5.5rem);
     border-bottom: 0.1rem solid var(--dark-blue-4);
+    overflow-y: scroll;
 `;
 
 const ChatMessages = styled.div`
     width: 100%;
 `;
 
+const ChatBottom = styled.div`
+    padding-bottom: 200px;
+`;
