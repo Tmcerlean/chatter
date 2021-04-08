@@ -19,6 +19,12 @@ const Chat = () => {
         getChannelName();
     }, [currentChannel]);
 
+    useEffect(() => {
+        chatInputRef?.current?.scrollIntoView({
+            behavior: 'smooth',
+        });
+    }, [messages]);
+
     const getMessages = async () => {
         if (currentChannel) {
             await firestore.collection('rooms').doc(currentChannel).collection('messages').orderBy('timestamp', 'asc').onSnapshot((querySnapshot) => {
@@ -28,7 +34,7 @@ const Chat = () => {
                     return
                 }
             })
-        };  
+        };
     };
 
     const renderMessages = () =>
@@ -117,5 +123,5 @@ const ChatMessages = styled.div`
 `;
 
 const ChatBottom = styled.div`
-    padding-bottom: 200px;
+    padding-bottom: 10rem;
 `;
