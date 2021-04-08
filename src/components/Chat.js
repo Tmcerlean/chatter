@@ -116,6 +116,18 @@ const ChatBodyContainer = styled.div`
     height: calc(100vh - 5.5rem);
     border-bottom: 0.1rem solid var(--dark-blue-4);
     overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+        width: 1rem;
+        background: var(--dark-blue-8);
+        border-radius: 1rem;
+        padding-right: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 1rem;
+        background: var(--dark-blue-4);
+    }
 `;
 
 const ChatMessages = styled.div`

@@ -6,10 +6,10 @@ import {
 import styled from 'styled-components';
 import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import Spinner from 'react-spinkit';
 import Chat from './Chat';
 import Login from './Login';
 import Sidebar from './Sidebar';
-import Spinner from 'react-spinkit';
 
 const App = () => {
 
@@ -20,13 +20,13 @@ const App = () => {
       <AppLoading>
         <AppLoadingContents>
           <img 
-            src="https://cdn.mos.cms.futurecdn.net/SDDw7CnuoUGax6x9mTo7dd.jpg"
-            alt=""
+            src="https://i.ibb.co/hsJKp2Q/Chatter-Logo.png"
+            alt="Chatter Logo"
           />
 
           <Spinner 
             name='ball-spin-fade-loader'
-            color='purple'
+            color='#36393F'
             fadeIn='none'
           />
         </AppLoadingContents>
