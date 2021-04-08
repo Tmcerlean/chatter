@@ -39,12 +39,13 @@ const Chat = () => {
 
     const renderMessages = () =>
     messages.docs.map(doc => {
+        console.log(doc.data().timestamp)
         return <Message 
             key={doc.id} 
             id={doc.id} 
-            name={doc.data().name} 
+            name={doc.data().user} 
             timestamp={doc.data().timestamp} 
-            image={doc.data().image} 
+            image={doc.data().userImage} 
             message={doc.data().message} 
         />;
     });

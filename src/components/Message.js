@@ -7,7 +7,7 @@ const Message = ({name, timestamp, image, message}) => {
             <MessageContent>
                 <MessageInfo>
                     <Username>{name}</Username>
-                    <Timestamp>05/04/2021</Timestamp>
+                    <Timestamp>{new Date(timestamp?.toDate()).toUTCString()}</Timestamp>
                 </MessageInfo>
                 <MessageText>{message}</MessageText>
             </MessageContent>

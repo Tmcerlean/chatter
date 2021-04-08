@@ -2,8 +2,9 @@ import styled from 'styled-components';
 import AddIcon from '@material-ui/icons/Add';
 import LanguageIcon from '@material-ui/icons/Language';
 import ChannelOption from './ChannelOption';
-import { firestore } from '../firebase';
+import firebase, { auth, firestore } from '../firebase';
 import { useEffect } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { setChannels } from '../actions';
 
@@ -12,12 +13,14 @@ const Sidebar = () => {
     const dispatch = useDispatch();
     const channels = useSelector((state) => state.channels);
 
+    const [user, loading] = useAuthState(auth);
+
     useEffect(() => {
       getChannels();
     }, []);
 
     const getChannels = async () => {
-        const snapShot = await firestore.collection('rooms').orderBy('name', 'asc').onSnapshot((querySnapshot) => {
+        await firestore.collection('rooms').orderBy('name', 'asc').onSnapshot((querySnapshot) => {
             if (querySnapshot) {
                 console.log(querySnapshot)
                 dispatch(setChannels(querySnapshot));
@@ -64,11 +67,11 @@ const Sidebar = () => {
             {/* Profile */}
             <ProfileContainer>
                 <ImageContainer>
-                    <Image src="https://i.ibb.co/ysfSym2/31129724.jpg" />
+                    <Image src={user?.photoURL} />
                     <OnlineStatus />
                 </ImageContainer>
                 <UserInfo>
-                    <Username>Tom</Username>
+                    <Username>{user?.displayName}</Username>
                 </UserInfo>
             </ProfileContainer>
         </SidebarContainer>

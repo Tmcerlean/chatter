@@ -1,18 +1,7 @@
-export const increment = () => {
+export const signIn = (user) => {
     return {
-        type: 'INCREMENT'
-    };
-};
-
-export const decrement = () => {
-    return {
-        type: 'DECREMENT'
-    };
-};
-
-export const signIn = () => {
-    return {
-        type: 'SIGN_IN'
+        type: 'SIGNED_IN',
+        payload: user
     };
 };
 

@@ -1,23 +1,24 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import styled from 'styled-components';
-import firebase, { firestore } from '../firebase';
+import firebase, { auth, firestore } from '../firebase';
 import InsertPhotoIcon from '@material-ui/icons/InsertPhoto';
 
 const ChatInput = ({ chatInputRef }) => {
 
     const [responseInput, setResponseInput] = useState('');
+    const [user, loading] = useAuthState(auth);
 
     const currentChannel = useSelector((state) => state.currentChannel);
 
     const submitMessage = (e) => {
         e.preventDefault();
-        console.log(e.target)
         firestore.collection('rooms').doc(currentChannel).collection('messages').add({
             message: responseInput,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            user: 'Tom',
-            userImage: 'https://media.wired.com/photos/5b899992404e112d2df1e94e/master/pass/trash2-01.jpg',
+            user: user.displayName,
+            userImage: user.photoURL
         });
 
         chatInputRef.current.scrollIntoView({
