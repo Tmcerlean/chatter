@@ -1,17 +1,13 @@
 import styled from 'styled-components';
 import ForumIcon from '@material-ui/icons/Forum';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { enterChannel } from '../actions';
-
-// If icon received in props then display the icon and the title
-// Otherwise display hash and the title
 
 const ChannelOption = ({ Icon, id, title }) => {
 
     const dispatch = useDispatch();
 
     const setChannel = () => {
-        console.log(id);
         dispatch(enterChannel(id));
     }
 
@@ -19,9 +15,9 @@ const ChannelOption = ({ Icon, id, title }) => {
         <Channel onClick={() => setChannel()}>
             {Icon && <Icon fontSize='medium'/>}
             {Icon ? (
-                <ChannelText>{title}</ChannelText>
+                <ChannelText>{ title }</ChannelText>
             ) : (
-                <ChannelText><ForumIconStyled />{title}</ChannelText>
+                <ChannelText><ForumIconStyled />{ title }</ChannelText>
             )}
         </Channel>
     )

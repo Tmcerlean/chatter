@@ -2,21 +2,24 @@ import styled from 'styled-components';
 import AddIcon from '@material-ui/icons/Add';
 import LanguageIcon from '@material-ui/icons/Language';
 import ChannelOption from './ChannelOption';
+import UserOption from './UserOption';
 import firebase, { auth, firestore } from '../firebase';
 import { useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useDispatch, useSelector } from 'react-redux';
-import { setChannels } from '../actions';
+import { setChannels, setOnlineUsers } from '../actions';
 
 const Sidebar = () => {
 
     const dispatch = useDispatch();
     const channels = useSelector((state) => state.channels);
+    const onlineUsers = useSelector((state) => state.onlineUsers);
 
     const [user, loading] = useAuthState(auth);
 
     useEffect(() => {
       getChannels();
+      getUsers();
     }, []);
 
     const getChannels = async () => {
@@ -24,6 +27,20 @@ const Sidebar = () => {
             if (querySnapshot) {
                 console.log(querySnapshot)
                 dispatch(setChannels(querySnapshot));
+            }
+        })
+    };
+
+    const getUsers = async () => {
+
+        const fiveMinutes = 300000
+
+        const onlineTimeStamp = new Date().getTime() - fiveMinutes
+
+        await firestore.collection('users').where('online', '>', onlineTimeStamp).orderBy('online', 'asc').onSnapshot((querySnapshot) => {
+            if (querySnapshot) {
+                console.log(querySnapshot.docs[0].data())
+                dispatch(setOnlineUsers(querySnapshot));
             }
         })
     };
@@ -50,13 +67,20 @@ const Sidebar = () => {
             />;
     });
 
+    const renderUsers = () =>
+    onlineUsers.docs.map(doc => {
+        return <UserOption 
+            key={doc.id} 
+            id={doc.id}
+            user={doc.data().user}
+        />;
+    });
+
     return (
         <SidebarContainer>
-            {/* Search */}
             <SidebarSearchContainer>
                 <SidebarSearch placeholder="Find or create a channel"/>
             </SidebarSearchContainer>
-            {/* Channels */}
             <ChannelContainer>
                 <ChannelHeader onClick={() => addChannel()}>
                     <ChannelHeaderText>Channels</ChannelHeaderText>
@@ -64,7 +88,12 @@ const Sidebar = () => {
                 </ChannelHeader>
                 {channels && channels.docs && renderChannels()} 
             </ChannelContainer>
-            {/* Profile */}
+            <UserContainer>
+                <UserHeader>
+                    <UserHeaderText>Users</UserHeaderText>
+                </UserHeader>
+                {onlineUsers && onlineUsers.docs && renderUsers()} 
+            </UserContainer>
             <ProfileContainer>
                 <ImageContainer>
                     <Image src={user?.photoURL} />
@@ -110,7 +139,7 @@ const SidebarSearch = styled.input`
 
 const ChannelContainer = styled.div`
     width: 90%;
-    height: 10px;
+    height: 40%;
     margin-top: 1.25rem;
 `;
 
@@ -134,6 +163,27 @@ const ChannelHeaderText = styled.div`
 const AddIconStyled = styled(AddIcon)`
     display: flex;
     margin-left: auto;
+    color: var(--light-grey-1);
+`;
+
+const UserContainer = styled.div`
+    display: flex;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    width: 90%;
+    height: 40%;
+`;
+
+const UserHeader = styled.div`
+    display: flex;
+    align-items: center;
+    width: 100%;
+`;
+
+const UserHeaderText = styled.div`
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    font-weight: 900;
     color: var(--light-grey-1);
 `;
 

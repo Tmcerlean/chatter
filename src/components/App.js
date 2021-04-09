@@ -1,10 +1,11 @@
+import { useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
 import styled from 'styled-components';
-import { auth } from '../firebase';
+import { auth, firestore } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Spinner from 'react-spinkit';
 import Chat from './Chat';
@@ -14,6 +15,43 @@ import Sidebar from './Sidebar';
 const App = () => {
 
   const [user, loading] = useAuthState(auth);
+
+  useEffect(() => {
+    if (user) {
+      const userDoc = firestore.collection("users").doc(user.uid);
+      
+      // Store user information in db
+      userDoc.set({
+        id: user.uid,
+        user: user.displayName,
+        emailAddress: user.email,
+        verified: user.emailVerified,
+        online: new Date().getTime(),
+        isOnline: false
+      });
+
+      // Maintain connection
+      const fiveMinutes = 300000
+
+      setInterval(() => {
+        userDoc.set({
+          online: new Date().getTime()
+        }, { merge: true });
+      }, fiveMinutes)
+
+      userDoc.onSnapshot(doc => {
+        const fiveMinutesAgo = new Date().getTime() - fiveMinutes
+        console.log("Five minutes ago:", fiveMinutesAgo);
+        console.log("Other data:", doc.data().online);
+        const isOnline = doc.data().online > fiveMinutesAgo
+        console.log("is online:", isOnline);
+        console.log(isOnline)
+        userDoc.set({
+          isOnline: isOnline
+        }, { merge: true });
+      })
+    }
+  }, [user]);
 
   if (loading) {
     return (
