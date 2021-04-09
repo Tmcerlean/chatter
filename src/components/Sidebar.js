@@ -35,7 +35,8 @@ const Sidebar = () => {
         const fiveMinutes = 300000;
         const twentyFourHours = 86400000;
 
-        const lastDayTimestamp = new Date().getTime() - twentyFourHours
+        const onlineNowTimestamp = new Date().getTime() - fiveMinutes;
+        const lastDayTimestamp = new Date().getTime() - twentyFourHours;
 
         await firestore.collection('users').where('online', '>', lastDayTimestamp).orderBy('online', 'asc').onSnapshot((querySnapshot) => {
             if (querySnapshot) {
@@ -44,7 +45,7 @@ const Sidebar = () => {
                 let recentlyOnline = [];
 
                 querySnapshot.forEach(documentSnapshot => {
-                    if (documentSnapshot.data().online > fiveMinutes) {
+                    if (documentSnapshot.data().online > onlineNowTimestamp) {
                         onlineNow.push(documentSnapshot);
                     } else {
                         recentlyOnline.push(documentSnapshot);

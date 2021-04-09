@@ -12,7 +12,7 @@ const Login = () => {
     return <LoginContainer>
         <LoginInnerContainer>
             <img 
-                src="https://cdn.mos.cms.futurecdn.net/SDDw7CnuoUGax6x9mTo7dd.jpg"
+                src="https://i.ibb.co/hsJKp2Q/Chatter-Logo.png"
             />
             <h1>Please sign in</h1>
             <p>Chatter</p>
