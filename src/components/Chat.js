@@ -39,7 +39,6 @@ const Chat = () => {
 
     const renderMessages = () =>
     messages.docs.map(doc => {
-        console.log(doc.data().timestamp)
         return <Message 
             key={doc.id} 
             id={doc.id} 

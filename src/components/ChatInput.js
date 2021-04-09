@@ -14,6 +14,11 @@ const ChatInput = ({ chatInputRef }) => {
 
     const submitMessage = (e) => {
         e.preventDefault();
+
+        if (responseInput === '') {
+            return;
+        };
+
         firestore.collection('rooms').doc(currentChannel).collection('messages').add({
             message: responseInput,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -53,7 +58,7 @@ const ChatResponseContainer = styled.div`
     position: fixed;
     bottom: 0;
     height: 5rem;
-    width: calc(100% - 30rem - 3rem);
+    width: calc(100% - 30rem - 4rem);
     margin: 1.5rem;
     border-radius: 0.75rem;
     background-color: var(--dark-blue-7);

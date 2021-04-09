@@ -4,17 +4,20 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-import styled from 'styled-components';
-import { auth, firestore } from '../firebase';
+import { useSelector } from 'react-redux';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Spinner from 'react-spinkit';
+import styled from 'styled-components';
+import { auth, firestore } from '../firebase';
 import Chat from './Chat';
 import Login from './Login';
+import NoChat from './NoChat';
 import Sidebar from './Sidebar';
 
 const App = () => {
 
   const [user, loading] = useAuthState(auth);
+  const currentChannel = useSelector((state) => state.currentChannel);
 
   useEffect(() => {
     if (user) {
@@ -38,18 +41,6 @@ const App = () => {
           online: new Date().getTime()
         }, { merge: true });
       }, fiveMinutes)
-
-      userDoc.onSnapshot(doc => {
-        const fiveMinutesAgo = new Date().getTime() - fiveMinutes
-        console.log("Five minutes ago:", fiveMinutesAgo);
-        console.log("Other data:", doc.data().online);
-        const isOnline = doc.data().online > fiveMinutesAgo
-        console.log("is online:", isOnline);
-        console.log(isOnline)
-        userDoc.set({
-          isOnline: isOnline
-        }, { merge: true });
-      })
     }
   }, [user]);
 
@@ -81,7 +72,11 @@ const App = () => {
         <Sidebar />
         <Switch>
           <Route path="/" exact>
-            <Chat />
+            {currentChannel ? (
+              <Chat />
+            ) : (
+              <NoChat />
+            )}
           </Route>
         </Switch>
       </Main>
@@ -117,9 +112,4 @@ const AppLoadingContents = styled.div`
     padding: 20px;
     margin-bottom: 40px;
   }
-`;
-
-const AppBody = styled.div`
-  display: flex;
-  height: 100vh;
 `;

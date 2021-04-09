@@ -1,20 +1,19 @@
 import styled from 'styled-components';
 import AddIcon from '@material-ui/icons/Add';
-import LanguageIcon from '@material-ui/icons/Language';
 import ChannelOption from './ChannelOption';
 import UserOption from './UserOption';
-import firebase, { auth, firestore } from '../firebase';
+import { auth, firestore } from '../firebase';
 import { useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useDispatch, useSelector } from 'react-redux';
-import { setChannels, setOnlineUsers } from '../actions';
+import { setChannels, setOnlineUsers, setRecentlyOnlineUsers } from '../actions';
 
 const Sidebar = () => {
 
     const dispatch = useDispatch();
     const channels = useSelector((state) => state.channels);
     const onlineUsers = useSelector((state) => state.onlineUsers);
-
+    const recentlyOnlineUsers = useSelector((state) => state.recentlyOnlineUsers);
     const [user, loading] = useAuthState(auth);
 
     useEffect(() => {
@@ -33,54 +32,96 @@ const Sidebar = () => {
 
     const getUsers = async () => {
 
-        const fiveMinutes = 300000
+        const fiveMinutes = 300000;
+        const twentyFourHours = 86400000;
 
-        const onlineTimeStamp = new Date().getTime() - fiveMinutes
+        const lastDayTimestamp = new Date().getTime() - twentyFourHours
 
-        await firestore.collection('users').where('online', '>', onlineTimeStamp).orderBy('online', 'asc').onSnapshot((querySnapshot) => {
+        await firestore.collection('users').where('online', '>', lastDayTimestamp).orderBy('online', 'asc').onSnapshot((querySnapshot) => {
             if (querySnapshot) {
-                console.log(querySnapshot.docs[0].data())
-                dispatch(setOnlineUsers(querySnapshot));
-            }
-        })
+
+                let onlineNow = [];
+                let recentlyOnline = [];
+
+                querySnapshot.forEach(documentSnapshot => {
+                    if (documentSnapshot.data().online > fiveMinutes) {
+                        onlineNow.push(documentSnapshot);
+                    } else {
+                        recentlyOnline.push(documentSnapshot);
+                    }
+                });
+                dispatch(setOnlineUsers(onlineNow));
+                dispatch(setRecentlyOnlineUsers(recentlyOnline));
+            };
+        });
     };
 
     const addChannel = async () => {
+
         const newChannel = await prompt("Please enter a channel name");
-        firestore.collection("rooms").doc().set({
-            name: newChannel
-        })
-        .then(() => {
-            console.log("Document successfully written!");
-        })
-        .catch((error) => {
-            console.error("Error writing document: ", error);
+
+        await firestore.collection('rooms').where('name', '==', newChannel).get().then((querySnapshot) => {
+            if (querySnapshot.docs.length > 0) {
+                alert("Channel already exists, please try again!")
+                return;
+            } else if (newChannel === '') {
+                alert("You did not enter a channel name, please try again!")
+                return;
+            }
+            firestore.collection("rooms").doc().set({
+                name: newChannel
+            })
+            .then(() => {
+                console.log("Channel created!");
+            })
+            .catch((error) => {
+                console.error("Error creating channel: ", error);
+            });
+        }).catch((error) => {
+            console.log("Error creating channel:", error);
         });
     };
   
-    const renderChannels = () =>
-        channels.docs.map(doc => {
+    const renderChannels = () => {
+        let channelList = channels.docs.map(doc => {
             return <ChannelOption 
                 key={doc.id} 
                 id={doc.id} 
                 title={doc.data().name} 
             />;
-    });
+        })
+        return channelList;
+    };
 
-    const renderUsers = () =>
-    onlineUsers.docs.map(doc => {
-        return <UserOption 
-            key={doc.id} 
-            id={doc.id}
-            user={doc.data().user}
-        />;
-    });
+    const renderOnlineUsers = () => {
+        let userList = onlineUsers.map(doc => {
+            return <UserOption 
+                key={doc.id} 
+                id={doc.id}
+                user={doc.data().user}
+                icon="var(--green-1)"
+            />;
+        })
+        return userList;
+    };
+
+    const renderRecentlyOnlineUsers = () => {
+        let userList = recentlyOnlineUsers.map(doc => {
+            return <UserOption 
+                key={doc.id} 
+                id={doc.id}
+                user={doc.data().user}
+                icon="var(--orange-1)"
+            />;
+        })
+        return userList;
+    };
 
     return (
         <SidebarContainer>
-            <SidebarSearchContainer>
-                <SidebarSearch placeholder="Find or create a channel"/>
-            </SidebarSearchContainer>
+            <SidebarLogoContainer>
+                <SidebarLogo>Chatter.</SidebarLogo>
+            </SidebarLogoContainer>
             <ChannelContainer>
                 <ChannelHeader onClick={() => addChannel()}>
                     <ChannelHeaderText>Channels</ChannelHeaderText>
@@ -92,7 +133,8 @@ const Sidebar = () => {
                 <UserHeader>
                     <UserHeaderText>Users</UserHeaderText>
                 </UserHeader>
-                {onlineUsers && onlineUsers.docs && renderUsers()} 
+                {onlineUsers && onlineUsers[0] && renderOnlineUsers()}
+                {recentlyOnlineUsers && recentlyOnlineUsers[0] && renderRecentlyOnlineUsers()}
             </UserContainer>
             <ProfileContainer>
                 <ImageContainer>
@@ -117,7 +159,7 @@ const SidebarContainer = styled.div`
     background-color: var(--dark-blue-2);
 `;
 
-const SidebarSearchContainer = styled.div`
+const SidebarLogoContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -126,21 +168,29 @@ const SidebarSearchContainer = styled.div`
     border-bottom: 0.1rem solid var(--dark-blue-4);
 `;
 
-const SidebarSearch = styled.input`
-    display: flex;
-    width: 90%;
-    height: 3rem;
-    padding-left: 1rem;
-    border: none;
-    border-radius: .4rem;
-    background-color: var(--dark-blue-4);
-    font-size: 1.4rem;
+const SidebarLogo = styled.h1`
+    font-size: 3rem;
+    color: var(--light-grey-1);
 `;
 
 const ChannelContainer = styled.div`
     width: 90%;
     height: 40%;
     margin-top: 1.25rem;
+    margin-bottom: 3rem;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 1rem;
+        background: var(--dark-blue-8);
+        border-radius: 1rem;
+        padding-right: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 1rem;
+        background: var(--dark-blue-4);
+    }
 `;
 
 const ChannelHeader = styled.div`
@@ -172,6 +222,20 @@ const UserContainer = styled.div`
     flex-wrap: wrap;
     width: 90%;
     height: 40%;
+    margin-bottom: 3rem;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 1rem;
+        background: var(--dark-blue-8);
+        border-radius: 1rem;
+        padding-right: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 1rem;
+        background: var(--dark-blue-4);
+    }
 `;
 
 const UserHeader = styled.div`

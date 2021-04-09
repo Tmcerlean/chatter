@@ -39,3 +39,10 @@ export const setOnlineUsers = (users) => {
         payload: users
     };
 };
+
+export const setRecentlyOnlineUsers = (users) => {
+    return {
+        type: 'SET_RECENTLY_ONLINE_USERS',
+        payload: users
+    };
+};
