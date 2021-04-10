@@ -1,3 +1,49 @@
+# Chatter
+A web based (desktop) chat application.
+- [Live demo.](https://chatter-8528a.web.app/)
+
+## Features
+- Real time channel-based chat.
+- User authentication.
+- Channel creation.
+- User presence within sidebar (online / recently online).
+- Dynamic asynchronous loading spinners.
+- Smooth scrolling chat animations.
+
+## Built With
+- React
+- React Router
+- React Firebase Hooks
+- Redux
+- Styled Components
+- Firebase Auth
+- Firebase Firestore
+- Firebase Hosting
+- Material-UI
+- HTML5
+- CSS3
+
+## Future Improvements
+- Add responsive design for mobile devices.
+- Add capacity to send images in messages.
+- Add capacity to send private direct messages.
+
+## Getting Started
+- Clone this project: git clone https://github.com/Tmcerlean/chatter.git
+- Install the required dependencies by using: npm install
+- A live demo of the project can be started by using: npm start
+- Distribution files can be produced using: npm run build
+
+## Acknowledgements
+- [The Odin Project - Final Project](https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript/lessons/final-project)
+
+## License
+- [MIT License](https://opensource.org/licenses/MIT)
+
+
+####################################################
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 
 ## Available Scripts
