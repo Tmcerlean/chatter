@@ -2,7 +2,7 @@
 A web based (desktop) chat application.
 - [Live demo.](https://chatter-8528a.web.app/)
 
-![](Chatter.gif)
+![](ChatterDemo.gif)
 
 ## Features
 - Real time channel-based chat.
